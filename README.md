@@ -2,8 +2,6 @@
 Code for paper: Photon Sphere Structure in Hayward Regular Black Holes
 # Code for: Photon Sphere Structure in Hayward Regular Black Holes  
 
-This repository contains scripts for reproducing results from the paper:  
-> "Photon Sphere Structure in Hayward Regular Black Holes Immersed in Power-Law Plasma Media"  
 
 ## Files  
 - `photon_sphere.py`: Solves Eq. (13) using Brent's method (Python 3.10)  
