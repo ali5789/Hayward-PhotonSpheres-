@@ -1,0 +1,16 @@
+(* verification.nb *)
+haywardF[r_, l_] := 1 - (2 r^2)/(r^3 + l^3);
+condition[r_, l_, K_, k_] := D[haywardF[r, l]/r^2 * (1 - K/r^k), r];
+
+(* Newton-Raphson solver *)
+findRoot[l_, K_, k_, guess_ : 3.0] := Module[{f, df, x0},
+  f[x_] := condition[x, l, K, k];
+  df[x_] = D[f[x], x];
+  x0 = guess;
+  Do[x0 = x0 - f[x0]/df[x0], {i, 10}];
+  x0
+];
+
+(* Verify Python results *)
+Print["Verification:"];
+Print["l=0.4, K=0.1, k=1: ", findRoot[0.4, 0.1, 1]];
