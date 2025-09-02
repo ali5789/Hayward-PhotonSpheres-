@@ -1,6 +1,5 @@
 # Hayward-PhotonSpheres-
 Code for paper: Photon Sphere Structure in Hayward Regular Black Holes
-# Code for: Photon Sphere Structure in Hayward Regular Black Holes  
 
 
 ## Files  
