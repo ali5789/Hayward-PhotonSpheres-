@@ -163,8 +163,8 @@ If you use this code, please cite:
 @article{Hasnain2024,
   title={Photon Sphere Structure in Hayward Regular Black Holes Immersed in Power-Law Plasma Media},
   author={Hasnain, Ali},
-  journal={[Journal Name]},
-  year={2024},
+  journal={[Astrophysics and Space Science]},
+  year={2026},
   note={Code: https://github.com/ali5789/Hayward-PhotonSpheres-}
 }
 ```
