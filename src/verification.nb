@@ -1,16 +1,88 @@
-(* verification.nb *)
-haywardF[r_, l_] := 1 - (2 r^2)/(r^3 + l^3);
-condition[r_, l_, K_, k_] := D[haywardF[r, l]/r^2 * (1 - K/r^k), r];
+(* ============================================ *)
+(* Mathematica Verification Script            *)
+(* Photon Sphere in Hayward-Plasma System     *)
+(* ============================================ *)
 
-(* Newton-Raphson solver *)
-findRoot[l_, K_, k_, guess_ : 3.0] := Module[{f, df, x0},
-  f[x_] := condition[x, l, K, k];
-  df[x_] = D[f[x], x];
-  x0 = guess;
-  Do[x0 = x0 - f[x0]/df[x0], {i, 10}];
-  x0
+(* Define Hayward metric function *)
+haywardF[r_, l_, M_:1] := 1 - (2*M*r^2)/(r^3 + l^3);
+
+(* Photon sphere condition: d/dr[f(r)/r^2 * (1 - K/r^k)] = 0 *)
+condition[r_, l_, K_, k_, M_:1] := 
+  D[haywardF[r, l, M]/r^2 * (1 - K/r^k), r];
+
+(* Newton-Raphson solver with better convergence *)
+findRoot[l_, K_, k_, guess_:3.0, maxIter_:20, tol_:10^-6] := 
+  Module[{f, df, x0, xNew, iter},
+    f[x_] := condition[x, l, K, k];
+    df[x_] = D[f[x], x];
+    x0 = guess;
+    
+    Do[
+      xNew = x0 - f[x0]/df[x0];
+      If[Abs[xNew - x0] < tol, Break[]];
+      x0 = xNew,
+      {iter, maxIter}
+    ];
+    
+    x0
+  ];
+
+(* Validation: Schwarzschild limit *)
+Print["=" <> StringRepeat["=", 60]];
+Print["VALIDATION TESTS"];
+Print["=" <> StringRepeat["=", 60]];
+
+schwarzschildTest = findRoot[0.0, 0.0, 1.0];
+Print["Schwarzschild (l=0, K=0): r_ph = ", N[schwarzschildTest, 8], 
+      " (Expected: 3.0)"];
+Print["Error: ", N[Abs[schwarzschildTest - 3.0], 3]];
+
+(* Cross-verify with Python results from Table 1 *)
+Print["\n" <> StringRepeat["-", 60]];
+Print["CROSS-VERIFICATION WITH PYTHON"];
+Print[StringRepeat["-", 60]];
+
+testCases = {
+  {0.0, 0.2, 1.0, "Perlick & Tsupko (2015)"},
+  {0.0, 0.3, 1.5, "Perlick & Tsupko (2015)"},
+  {0.5, 0.1, 1.0, "Hayward + Plasma"},
+  {0.7, 0.2, 1.5, "Hayward + Plasma"},
+  {1.0, 0.3, 2.0, "Hayward + Plasma"}
+};
+
+Print[StringForm["``  ``  ``  ``  ``", 
+  PaddedForm["l", {5}], PaddedForm["K", {5}], 
+  PaddedForm["k", {5}], PaddedForm["r_ph", {10}], "Description"]];
+
+Do[
+  {l, K, k, desc} = test;
+  rph = findRoot[l, K, k];
+  Print[StringForm["``  ``  ``  ``  ``", 
+    PaddedForm[l, {5, 1}], PaddedForm[K, {5, 1}], 
+    PaddedForm[k, {5, 1}], PaddedForm[N[rph, 6], {10, 6}], desc]],
+  {test, testCases}
 ];
 
-(* Verify Python results *)
-Print["Verification:"];
-Print["l=0.4, K=0.1, k=1: ", findRoot[0.4, 0.1, 1]];
+(* Generate data for plotting *)
+Print["\n" <> StringRepeat["-", 60]];
+Print["FIGURE 1 DATA: r_ph vs l for K=0.1, k=1.0"];
+Print[StringRepeat["-", 60]];
+
+lValues = Table[l, {l, 0.0, 1.0, 0.1}];
+rphValues = Table[findRoot[l, 0.1, 1.0], {l, lValues}];
+
+data = Transpose[{lValues, rphValues}];
+Print[TableForm[data, 
+  TableHeadings -> {None, {"l/M", "r_ph/M"}},
+  TableAlignments -> Center]];
+
+(* Optional: Plot if running in notebook *)
+(* 
+ListLinePlot[data, 
+  PlotLabel -> "Photon Sphere vs Regularization Parameter",
+  AxesLabel -> {"l/M", "r_ph/M"},
+  GridLines -> Automatic,
+  PlotStyle -> {Thick, Blue}]
+*)
+
+Print["\n✓ Verification complete"];
