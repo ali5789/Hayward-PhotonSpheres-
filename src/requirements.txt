@@ -1,3 +1,10 @@
-numpy==1.26.4
-scipy==1.11.4
-matplotlib==3.8.4
+# Core scientific computing
+numpy>=1.24.0,<2.1.0
+scipy>=1.11.0,<1.14.0
+
+# Visualization (optional, for plotting)
+matplotlib>=3.7.0,<3.10.0
+
+# Development dependencies (optional)
+# pytest>=7.0.0  # for unit tests
+# jupyter>=1.0.0  # for interactive notebooks
